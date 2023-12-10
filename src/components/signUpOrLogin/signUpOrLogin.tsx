@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import { Signup } from '../signup/Signup'
 import { Login } from '../login/Login'
 import './style.scss'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 export function SignUpOrLogin() {
 	const [login, setLogin] = useState(false)
@@ -23,6 +25,7 @@ export function SignUpOrLogin() {
 				</p>
 			</div>
 			{login === true ? <Login /> : <Signup />}
+			<ToastContainer />
 		</div>
 	)
 }

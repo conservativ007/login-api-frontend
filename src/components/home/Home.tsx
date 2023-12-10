@@ -3,5 +3,5 @@ import { useUser } from '../../store/store'
 
 export function Home() {
 	const { name } = useUser(state => state)
-	return <h1 style={{ textAlign: 'center' }}>Hello {name}!</h1>
+	return <h1 style={{ textAlign: 'center' }}>Hi {name} you're logged in.</h1>
 }

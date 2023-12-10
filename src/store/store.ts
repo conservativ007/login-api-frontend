@@ -1,6 +1,9 @@
 import { create } from 'zustand'
 import { CONSTANTS } from '../constants'
 import { IUser } from '../types'
+import { useToast } from '../hooks/useToasts'
+
+const UseTest = useToast
 
 export interface User {
 	name: string
@@ -35,7 +38,17 @@ export const useUser = create<User>(set => ({
 		})
 
 		const data = await response.json()
-		console.log(data)
+
+		if (!response.ok) {
+			data.message.forEach((message: string) => UseTest(false, message))
+		}
+
+		if (response.ok) {
+			UseTest(
+				true,
+				'registration has been successfully completed, you can now log in'
+			)
+		}
 	},
 	userLogin: async (username: string, password: string) => {
 		const response = await fetch(CONSTANTS.login, {
@@ -50,7 +63,6 @@ export const useUser = create<User>(set => ({
 		})
 
 		const data = await response.json()
-		console.log(data)
 
 		if (response.ok) {
 			set(state => ({ ...state, isUserLogged: true }))
