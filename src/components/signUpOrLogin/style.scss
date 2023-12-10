@@ -1,0 +1,39 @@
+.signup {
+  display: flex;
+  gap: 15px;
+
+  .active {
+    background-color: #3498db;
+    color: white;
+    transition: all 0.2s;
+  }
+
+  p {
+    padding: 0.5rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  input {
+    outline: none;
+    height: 40px;
+    font-size: 20px;
+    border-radius: 5px;
+    padding-left: 10px;
+  }
+
+  button {
+    height: 40px;
+    background-color: #16a085;
+    border: none;
+    border-radius: 5px;
+    font-size: 20px;
+    color: white;
+  }
+}
