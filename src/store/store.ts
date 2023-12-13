@@ -27,50 +27,61 @@ export const useUser = create<User>(set => ({
 	setUserLogged: value => set(state => ({ ...state, isUserLogged: value })),
 
 	userSignup: async (user: IUser) => {
-		const response = await fetch(CONSTANTS.signup, {
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			method: 'POST',
-			body: JSON.stringify({
-				...user
+		try {
+			const response = await fetch(CONSTANTS.signup, {
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				method: 'POST',
+				body: JSON.stringify({
+					...user
+				})
 			})
-		})
 
-		const data = await response.json()
+			const data = await response.json()
 
-		if (!response.ok) {
-			data.message.forEach((message: string) => UseTest(false, message))
-		}
+			if (!response.ok) {
+				data.message.forEach((message: string) => UseTest(false, message))
+			}
 
-		if (response.ok) {
-			UseTest(
-				true,
-				'registration has been successfully completed, you can now log in'
-			)
+			if (response.ok) {
+				UseTest(
+					true,
+					'registration has been successfully completed, you can now log in'
+				)
+			}
+		} catch (error) {
+			console.log(error)
 		}
 	},
 	userLogin: async (username: string, password: string) => {
-		const response = await fetch(CONSTANTS.login, {
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			method: 'POST',
-			body: JSON.stringify({
-				username,
-				password
+		try {
+			const response = await fetch(CONSTANTS.login, {
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				method: 'POST',
+				body: JSON.stringify({
+					username,
+					password
+				})
 			})
-		})
 
-		const data = await response.json()
+			const data = await response.json()
 
-		if (response.ok) {
-			set(state => ({ ...state, isUserLogged: true }))
-			set(state => ({ ...state, name: data.name }))
-		}
+			if (response.ok) {
+				set(state => ({ ...state, isUserLogged: true }))
+				set(state => ({ ...state, name: data.name }))
 
-		if (!response.ok) {
-			set(state => ({ ...state, isUserLogged: false }))
+				console.log(data)
+			}
+
+			if (!response.ok) {
+				set(state => ({ ...state, isUserLogged: false }))
+				data.message.forEach((message: string) => UseTest(false, message))
+			}
+		} catch (error) {
+			console.log(error)
 		}
 	},
 	setName: name => set(state => ({ ...state, name })),
