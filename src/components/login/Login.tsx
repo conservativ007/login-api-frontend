@@ -37,7 +37,7 @@ export function Login() {
 				onChange={e => setPassword(e.target.value)}
 			/>
 
-			<button onClick={() => userLogin(username, password)}>userLogin</button>
+			<button onClick={() => userLogin(username, password)}>Login</button>
 		</div>
 	)
 }
