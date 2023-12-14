@@ -18,7 +18,6 @@ export function Login() {
 	useEffect(() => {
 		if (isUserLogged === true) {
 			navigate('/home')
-			setUserLogged(false)
 		}
 	}, [isUserLogged, navigate, setUserLogged])
 

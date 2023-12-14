@@ -72,8 +72,6 @@ export const useUser = create<User>(set => ({
 			if (response.ok) {
 				set(state => ({ ...state, isUserLogged: true }))
 				set(state => ({ ...state, name: data.name }))
-
-				console.log(data)
 			}
 
 			if (!response.ok) {
