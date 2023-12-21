@@ -9,17 +9,16 @@ export function Login() {
 		setUsername,
 		userLogin,
 		setPassword,
-		isUserLogged,
-		setUserLogged
+		accessToken
 	} = useUser(state => state)
 
 	const navigate = useNavigate()
 
 	useEffect(() => {
-		if (isUserLogged === true) {
+		if (typeof accessToken === 'string' && accessToken !== '') {
 			navigate('/home')
 		}
-	}, [isUserLogged, navigate, setUserLogged])
+	}, [navigate, accessToken])
 
 	return (
 		<div className='form'>

@@ -1,57 +1,75 @@
 import { create } from 'zustand'
 import { CONSTANTS } from '../constants'
-import { IUser } from '../types'
+import { UserWithoutId } from '../types'
 import { useToast } from '../hooks/useToasts'
+import { decodeToken, getRefresh, getUserSignup } from './actions'
 
 const UseTest = useToast
 
-export interface User {
+export interface SliceUser {
+	userId: number
 	name: string
 	username: string
 	password: string
-	isUserLogged: boolean
+	accessToken: string | undefined
+	setAccessToken: (token: string | undefined) => void
 	setName: (name: string) => void
 	setUsername: (username: string) => void
+	reloadPage: (token: string) => void
 	setPassword: (password: string) => void
-	setUserLogged: (value: boolean) => void
-	userSignup: (user: IUser) => void
+	userSignup: (user: UserWithoutId) => void
 	userLogin: (username: string, password: string) => void
+	refresh: (token: string) => void
+	userLogOut: () => void
 }
 
-export const useUser = create<User>(set => ({
+export const useUser = create<SliceUser>(set => ({
 	title: '',
+	userId: 0,
 	name: '',
 	username: '',
 	password: '',
-	isUserLogged: false,
-	setUserLogged: value => set(state => ({ ...state, isUserLogged: value })),
-
-	userSignup: async (user: IUser) => {
+	accessToken: undefined,
+	refresh: async (token: string) => {
+		const data = await getRefresh(token)
+		if (data !== false) {
+			set(state => ({ ...state, accessToken: data.accessToken }))
+			localStorage.setItem('token', data.accessToken)
+		}
+	},
+	reloadPage: async (token: string) => {
 		try {
-			const response = await fetch(CONSTANTS.signup, {
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				method: 'POST',
-				body: JSON.stringify({
-					...user
-				})
-			})
-
-			const data = await response.json()
-
-			if (!response.ok) {
-				data.message.forEach((message: string) => UseTest(false, message))
-			}
-
-			if (response.ok) {
-				UseTest(
-					true,
-					'registration has been successfully completed, you can now log in'
-				)
-			}
+			const data = await decodeToken(token)
+			set(state => ({ ...state, accessToken: data.accessToken }))
+			set(state => ({ ...state, userId: data.userId }))
+			set(state => ({ ...state, name: data.name }))
+			return data
 		} catch (error) {
 			console.log(error)
+		}
+	},
+	userLogOut: async () => {
+		try {
+			await fetch(CONSTANTS.logout, {
+				method: 'GET'
+			})
+		} catch (error) {
+			console.log(error)
+		}
+	},
+	setAccessToken: token => set(state => ({ ...state, accessToken: token })),
+
+	userSignup: async (user: UserWithoutId) => {
+		const someUser = await getUserSignup(user)
+		if (someUser.error === false) {
+			UseTest(
+				true,
+				'registration has been successfully completed, you can now log in'
+			)
+		}
+
+		if (someUser.error === true) {
+			someUser.messages?.forEach((message: string) => UseTest(false, message))
 		}
 	},
 	userLogin: async (username: string, password: string) => {
@@ -60,6 +78,7 @@ export const useUser = create<User>(set => ({
 				headers: {
 					'Content-Type': 'application/json'
 				},
+				credentials: 'include',
 				method: 'POST',
 				body: JSON.stringify({
 					username,
@@ -70,14 +89,13 @@ export const useUser = create<User>(set => ({
 			const data = await response.json()
 
 			if (response.ok) {
-				set(state => ({ ...state, isUserLogged: true }))
+				set(state => ({ ...state, accessToken: data.accessToken }))
+				set(state => ({ ...state, userId: data.userId }))
 				set(state => ({ ...state, name: data.name }))
-
-				console.log(data)
+				localStorage.setItem('token', data.accessToken)
 			}
 
 			if (!response.ok) {
-				set(state => ({ ...state, isUserLogged: false }))
 				data.message.forEach((message: string) => UseTest(false, message))
 			}
 		} catch (error) {

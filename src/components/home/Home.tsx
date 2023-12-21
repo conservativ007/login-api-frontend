@@ -1,27 +1,41 @@
 import React, { useEffect } from 'react'
 import { useUser } from '../../store/store'
 import { useNavigate } from 'react-router-dom'
+import './style.scss'
 
 export function Home() {
-	const { name, setUserLogged, isUserLogged } = useUser(state => state)
+	const { name, accessToken, setAccessToken, refresh } = useUser(state => state)
 
 	const navigate = useNavigate()
 
-	const exitToStartPage = () => {
+	const exitToHomePage = () => {
 		navigate('/')
-		setUserLogged(false)
+		setAccessToken(undefined)
+		localStorage.setItem('token', '')
+	}
+
+	const getRefresh = async () => {
+		if (accessToken === undefined) return
+		await refresh(accessToken)
 	}
 
 	useEffect(() => {
-		if (isUserLogged === false) navigate('/')
-	}, [isUserLogged, navigate])
+		if (accessToken === undefined) {
+			navigate('/')
+		}
+	}, [navigate, accessToken])
 
-	return isUserLogged === true ? (
-		<div className='home'>
-			<h1 style={{ textAlign: 'center' }}>Hi {name} you're logged in.</h1>
-			<button onClick={exitToStartPage}>exit</button>
-		</div>
-	) : (
-		<></>
-	)
+	if (accessToken !== undefined) {
+		return (
+			<div className='home'>
+				<h1 style={{ textAlign: 'center' }}>Hi {name} you're logged in.</h1>
+				<div>
+					<button onClick={exitToHomePage}>exit</button>
+					<button onClick={getRefresh}>refresh</button>
+				</div>
+			</div>
+		)
+	} else {
+		return <></>
+	}
 }
